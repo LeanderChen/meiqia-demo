@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JS客服演示</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+    <!-- here for doc help: https://meiqia.com/docs/meiqia-js-sdk -->
+    <!-- step.1 load plugin dynamically -->
+    <script type='text/javascript'>
+        (function(m, ei, q, i, a, j, s) {
+            m[i] = m[i] || function() {
+                (m[i].a = m[i].a || []).push(arguments)
+            };
+            j = ei.createElement(q),
+                s = ei.getElementsByTagName(q)[0];
+            j.async = true;
+            j.charset = 'UTF-8';
+            j.src = 'https://static.meiqia.com/dist/meiqia.js?_=t';
+            s.parentNode.insertBefore(j, s);
+        })(window, document, 'script', '_MEIQIA');
+        // 配置项
+        _MEIQIA('entId', '141392');                     // 企业编号
+        // _MEIQIA('withoutBtn');                       // 不显示按钮
+        // _MEIQIA('language','en');                    // 如果需要英文版，可用如下配置
+        _MEIQIA('allSet', function() {                  // 初始化成功时的回调
+            console.log('meiqia init success! ');
+        });
+        _MEIQIA('startConversation', function() {        // 会话开始时的回调
+            console.log('chat start success! ');
+        });
+        _MEIQIA('endConversation', function() {         // 结束会话回调，Note: 会话在一段时间无聊天后关闭
+            console.log('chat closed now! ');
+        });
+        _MEIQIA('getPanelVisibility', function(v) {     // 处理聊天面板开关回调
+            if(v == 'visible')
+                console.log('panel is shown, you can ...');
+            else
+                console.log('panel is closed, maybe you should go back to previous page...')
+        });
+        _MEIQIA('fallback', 3);                         // 指定的客服不在线或无法服务时，可以通过在美洽嵌入代码之后设置 fallback 接受的参数为数字类型，目前有 1（不转接（进入留言也面））、2（转接到客服所属于的组）、3（转接到全企业（这是美洽默认的处理方式））
+        _MEIQIA('clientId', 'mutaoinc-' + 'demo');      // 使用6-32位字符串唯一标识客户
+        _MEIQIA('convClickCallback', function(t, i) {   // 根据聊天面板会话状态类型，会话id决定回调处理
+            if(t == 'conv') {           // 会话中
+                alert('客服接线成功， 会话编号：' + i);
+            } else if(t == 'queue') {   // 排队中
+                alert('聊天排队中， 会话编号：' + i);
+            } else if(t == 'ticket') {  // 工单中
+                alert('工单处理中， 会话编号：' + i);
+            } else {  // 未定义状态
+                console.log('unknown conversation state! ')
+            }
+        });
+
+        // step.2 init meiqia chat
+        // 在这里开启手动模式
+        // _MEIQIA('manualInit');
+        // 页面初始，自动启动
+        _MEIQIA('init');
+
+
+        // step.3 carray user info (important)
+        _MEIQIA('metadata', {
+            address: '南京市 鼓楼区 中山北路 212号',
+            age: '2',
+            comment: '这是来自web演示的会话',
+            email: 'joj@mutaoinc.com',
+            gender: '女',
+            name: 'joj',
+            qq: '23341996',
+            tel: '02585203949',
+            weibo: '',
+            weixin: 'mutaoinc'
+        });
+
+
+        // step.4 open chat panel
+        _MEIQIA('showPanel');
+        // _MEIQIA('hidePanel');                        // 隐藏面板
+
+
+        // step.5 bind user action(optional). Note: custom service will see these user-action.
+        useraction_demo1 = () => {
+            _MEIQIA('metadata', {
+                action: 'PAGE load before 4s'
+            });
+        }
+        setTimeout(useraction_demo1, 4000);
+
+
+        // other options. Note: these option for solution B, can be used to replace solution above.
+        // note.1 使用 [`追踪自定义聊天按钮点击事件`](https://meiqia.com/docs/meiqia-js-sdk#%E8%BF%BD%E8%B8%AA%E8%87%AA%E5%AE%9A%E4%B9%89%E8%81%8A%E5%A4%A9%E6%8C%89%E9%92%AE%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6) 替换默认聊天按钮，打开聊天面板
+        // <ul>
+            // <li onClick="_MEIQIA('showPanel', {greeting: '咨询A套餐'})">A 套餐</li>
+            // <li onClick="_MEIQIA('showPanel', {greeting: '咨询B套餐'})">B 套餐</li>
+            // <li onClick="_MEIQIA('showPanel', {greeting: '咨询C套餐'})">C 套餐</li>
+        // </ul>
+        
+        // note.2 使用 [`获取未读消息`](https://meiqia.com/docs/meiqia-js-sdk#%E8%8E%B7%E5%8F%96%E6%9C%AA%E8%AF%BB%E6%B6%88%E6%81%AF) 替换默认聊天按钮，呈现未读消息
+        // Note: this config option must be set before meiqia-init!
+        // _MEIQIA('getUnreadMsg', (data) => {
+        //     if (typeof data == 'object')
+        //         let unreadNum = document.getElementById('unreadNum').innerHTML,
+        //             lastMsg = data[data.length - 1],
+        //             num = isNaN(+unreadNum) ? msg.length : +unreadNum + msg.length;
+        //     else if (data == 'hasBeenRead')
+        //         console.log('No msg unread! ');
+        // });
+        
+        // note.3 使用 [`获取邀请事件`](https://meiqia.com/docs/meiqia-js-sdk#%E8%8E%B7%E5%8F%96%E9%82%80%E8%AF%B7%E4%BA%8B%E4%BB%B6)、 [`拒绝邀请`](https://meiqia.com/docs/meiqia-js-sdk#%E6%8B%92%E7%BB%9D%E9%82%80%E8%AF%B7) 替换默认邀请窗口
+
+        // code can be refered at <https://meiqia.com/docs/meiqia-js-sdk#%E8%8E%B7%E5%8F%96%E9%82%80%E8%AF%B7%E4%BA%8B%E4%BB%B6>
+        
+        // note.4 使用 [`聊天链接`](https://meiqia.com/docs/meiqia-js-sdk#%E8%81%8A%E5%A4%A9%E9%93%BE%E6%8E%A5%E4%BC%A0%E9%80%92%E9%A1%BE%E5%AE%A2%E4%BF%A1%E6%81%AF) 在替换js-sdk启动聊天，该方式转入美洽服务，无法进行应用（页）内生命周期控制
+
+    </script>
+</body>
+</html>
